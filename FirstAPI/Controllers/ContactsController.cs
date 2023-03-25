@@ -1,6 +1,5 @@
 ﻿using FirstAPI.Data;
 using FirstAPI.Models;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +15,9 @@ namespace FirstAPI.Controllers
         {
             this.dbContext = dbContext;
         }
-        
-        
-        
+
+
+
         //[] face adnotare
         [HttpGet]
         public async Task<IActionResult> GetContacts()
@@ -27,7 +26,7 @@ namespace FirstAPI.Controllers
         }
 
         [HttpPost]
-        public async Task< IActionResult> AddContact(AddContactRequest addContactRequest)
+        public async Task<IActionResult> AddContact(AddContactRequest addContactRequest)
         {
             var contact = new Contact()
             {
@@ -38,11 +37,34 @@ namespace FirstAPI.Controllers
                 Phone = addContactRequest.Phone
             };
 
-           await  dbContext.Contacts.AddAsync(contact);
-           await dbContext.SaveChangesAsync();
+            await dbContext.Contacts.AddAsync(contact);
+            await dbContext.SaveChangesAsync();
 
-           
-           return Ok(contact);   
+
+            return Ok(contact);
+        }
+
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateContact([FromRoute] Guid id, UpdateContactRequest updateContactRequest)
+        {
+            var contact=await dbContext.Contacts.FindAsync(id);
+
+            if (contact!= null)
+            {
+                contact.FullName= updateContactRequest.FullName;    
+                contact.Adress= updateContactRequest.Adress;
+                contact.Phone= updateContactRequest.Phone;  
+                contact.Email= updateContactRequest.Email;
+
+                await dbContext.SaveChangesAsync();
+
+                return Ok(contact);
+            }
+
+            return NotFound();
+
         }
 
 
